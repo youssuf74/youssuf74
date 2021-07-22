@@ -1,0 +1,246 @@
+
+JOUEUR   = jeu. Joueurs . LocalPlayer
+SOURIS    = LECTEUR : GetMouse ()
+CC       = jeu. Espace de travail . Caméra actuelle
+
+ACTIVÉ       =  vrai
+ESP_ENABLED   =  vrai
+
+_G . FREE_FOR_ALL  =  vrai
+
+_G . LIER         =  ' y '
+_G . ESP_BIND     =  ' t '
+_G . CHANGE_AIM   =  ' q '
+
+_G . AIM_AT  =  ' Tête '
+
+attendre ( 1 )
+
+fonction  GetNearestPlayerToMouse ()
+Zombies       = {}
+local PLAYER_HOLD   = {}
+DISTANCES     locales = {}
+pour i, v par  paires (jeu. Espace de travail . Zombies : GetChildren ()) faire
+si v ~= JOUEUR alors
+table.insert (Zombies, v)
+finir
+finir
+pour i, v par  paires (Zombies) faire
+si  _G . FREE_FOR_ALL  ==  faux  alors
+si v et (v) ~=  nil  et v. TeamColor  ~= Zombies. TeamColor  puis
+AIM local = v : FindFirstChild ( _G . AIM_AT )
+si AIM ~=  nil  alors
+local DISTANCE                  = (AIM. Position  - jeu. Workspace . CurrentCamera . CoordinateFrame . p ). ordre de grandeur
+RAY                       local = Rayon. nouveau (jeu. Workspace . CurrentCamera . CoordinateFrame . p , (MOUSE. Hit . p  - CC. CoordinateFrame . p ). unit  * DISTANCE)
+HIT local ,POS                   = jeu. Espace de travail : FindPartOnRay (RAY, jeu. Espace de travail )
+local DIFF                      =  math.floor ((POS - AIM. Position ). magnitude )
+PLAYER_HOLD[v. Nom  .. i]        = {}
+PLAYER_HOLD[v. Nom  .. je]. dist   = DISTANCE
+PLAYER_HOLD[v. Nom  .. je]. plr    = v
+PLAYER_HOLD[v. Nom  .. je]. diff   = DIFF
+table.insert (DISTANCES, DIFF)
+finir
+finir
+elseif  _G . FREE_FOR_ALL  ==  vrai  alors
+AIM local = v : FindFirstChild ( _G . AIM_AT )
+si AIM ~=  nil  alors
+local DISTANCE                  = (AIM. Position  - jeu. Workspace . CurrentCamera . CoordinateFrame . p ). ordre de grandeur
+RAY                       local = Rayon. nouveau (jeu. Workspace . CurrentCamera . CoordinateFrame . p , (MOUSE. Hit . p  - CC. CoordinateFrame . p ). unit  * DISTANCE)
+HIT local ,POS                   = jeu. Espace de travail : FindPartOnRay (RAY, jeu. Espace de travail )
+local DIFF                      =  math.floor ((POS - AIM. Position ). magnitude )
+PLAYER_HOLD[v. Nom  .. i]        = {}
+PLAYER_HOLD[v. Nom  .. je]. dist   = DISTANCE
+PLAYER_HOLD[v. Nom  .. je]. plr    = v
+PLAYER_HOLD[v. Nom  .. je]. diff   = DIFF
+table.insert (DISTANCES, DIFF)
+finir
+finir
+finir
+
+si  décompresser (DISTANCES) ==  nul  alors
+retourner  faux
+finir
+
+local L_DISTANCE =  math.floor ( math.min ( décompresser (DISTANCES)))
+si L_DISTANCE >  20  alors
+retourner  faux
+finir
+
+pour i, v par  paires (PLAYER_HOLD) faire
+si v. diff  == L_DISTANCE alors
+retour v. plr
+finir
+finir
+retourner  faux
+finir
+
+GUI_MAIN                            = Instance. nouveau ( ' ScreenGui ' , jeu. CoreGui )
+GUI_TARGET                          = Instance. nouveau ( ' TextLabel ' , GUI_MAIN)
+GUI_AIM_AT                          = Instance. nouveau ( ' TextLabel ' , GUI_MAIN)
+
+GUI_MAIN. Nom                       =  ' AIMBOT '
+
+GUI_TARGET. Taille                     = UDim2. nouveau ( 0 , 200 , 0 , 30 )
+GUI_TARGET. Transparence d'arrière-plan   =  0.5
+GUI_TARGET. BackgroundColor          = BrickColor. nouveau ( ' Fossile ' )
+GUI_TARGET. TailleBordurePixel          =  0
+GUI_TARGET. Position                 = UDim2. nouveau ( 0.5 , - 100 , 0 , 0 )
+GUI_TARGET. Texte                     =  ' AIMBOT : OFF '
+GUI_TARGET. TextColor3               = Color3 . nouveau ( 1 , 1 , 1 )
+GUI_TARGET. TextStrokeTransparency   =  1
+GUI_TARGET. TextWrapped              =  vrai
+GUI_TARGET. TailleFont                 =  ' Taille24 '
+GUI_TARGET. Police                     =  ' SourceSansBold '
+
+GUI_AIM_AT. Taille                     = UDim2. nouveau ( 0 , 200 , 0 , 20 )
+GUI_AIM_AT. Transparence d'arrière-plan   =  0.5
+GUI_AIM_AT. BackgroundColor          = BrickColor. nouveau ( ' Fossile ' )
+GUI_AIM_AT. TailleBordurePixel          =  0
+GUI_AIM_AT. Position                 = UDim2. nouveau ( 0.5 , - 100 , 0 , 30 )
+GUI_AIM_AT. Texte                     =  ' VISÉE : TÊTE '
+GUI_AIM_AT. TextColor3               = Color3 . nouveau ( 1 , 1 , 1 )
+GUI_AIM_AT. TextStrokeTransparency   =  1
+GUI_AIM_AT. TextWrapped              =  vrai
+GUI_AIM_AT. TailleFont                 =  ' Taille18 '
+GUI_AIM_AT. Police                     =  ' SourceSansBold '
+
+PISTE locale =  faux
+
+fonction  CREATE ( BASE , TEAM ) -- tête de joueur et vrai/faux
+local ESP_MAIN                    = Instance. nouveau ( ' BillboardGui ' , PLAYER. PlayerGui )
+local ESP_DOT                     = Instance. nouveau ( ' TextLabel ' , ESP_MAIN)
+ESP_DOT. TextColor3  = Color3 . à partir de RVB ( 0 , 0 , 0 )
+ESP_DOT. Police  =  " Dessin animé "
+ESP_DOT. TextSize  =  20  -- 14 par défaut
+ESP_DOT. Texte  = BASE. Parent . Nom
+local ESP_NAME                    = Instance. nouveau ( ' TextLabel ' , ESP_MAIN)
+
+ESP_MAIN. Nom                     =  ' ESP '
+ESP_MAIN. Adornée                  = BASE
+ESP_MAIN. AlwaysOnTop              =  vrai
+ESP_MAIN. ExtentsOffset            = Vector3. nouveau ( 0 , 1 , 0 )
+ESP_MAIN. Taille                     = UDim2. nouveau ( 0 , 5 , 0 , 5 )
+
+ESP_DOT. Nom                      =  ' POINT '
+ESP_DOT. BackgroundColor           = BrickColor. nouveau ( ' Rouge vif ' )
+ESP_DOT. FondTransparence    =  0.3
+ESP_DOT. TailleBordurePixel           =  0
+ESP_DOT. Position                  = UDim2. nouveau ( - 0.5 , 0 , - 0.5 , 0 )
+ESP_DOT. Taille                      = UDim2. nouveau ( 2 , 0 , 2 , 0 )
+ESP_DOT. Visible                   =  vrai
+ESP_DOT. ZIndex                    =  10
+
+ESP_NAME. Nom                     =  ' NOM '
+ESP_NAME. BackgroundColor3         = Color3. nouveau ( 255 , 255 , 255 )
+ESP_NAME. FondTransparence   =  1
+ESP_NAME. TailleBordurePixel          =  0
+ESP_NAME. Position                 = UDim2. nouveau ( 0 , 0 , 0 , - 40 )
+ESP_NAME. Taille                     = UDim2. nouveau ( 1 , 0 , 10 , 0 )
+ESP_NAME. Visible                  =  vrai
+ESP_NAME. ZIndex                   =  10
+ESP_NAME. Police                     =  ' ArialBold '
+ESP_NAME. TailleFont                 =  ' Taille14 '
+ESP_NAME. Texte                     = BASE. Parent . Nom
+ESP_NAME. TextColor                = BrickColor. nouveau ( ' Rouge vif ' )
+finir
+
+fonction  EFFACER ()
+pour _,v par  paires (PLAYER. PlayerGui : children ()) do
+si v. Name  ==  ' ESP '  et v: IsA ( ' BillboardGui ' ) alors
+v : Détruire ()
+finir
+finir
+finir
+
+fonction  CHERCHER ()
+EFFACER ()
+PISTE =  vrai
+spawn ( fonction ()
+en  attendant () faire
+si TRACK alors
+EFFACER ()
+pour i,v par  paires (jeu. Workspace . Zombies : GetChildren ()) faire
+si v et v : FindFirstChild ( ' Head ' ) alors
+if v: FindFirstChild ( ' Head ' ) alors
+CRÉER (v. Tête , vrai )
+finir
+finir
+finir
+finir
+finir
+attendre ( 1 )
+fin )
+finir
+
+SOURIS. KeyDown : connecter ( fonction ( KEY )
+KEY = KEY : inférieur () : octet ()
+si CLÉ ==  _G . LIER  alors
+ACTIVÉ =  vrai
+finir
+fin )
+
+SOURIS. KeyUp : connecter ( fonction ( KEY )
+KEY = KEY : inférieur () : octet ()
+si CLÉ ==  _G . LIER  alors
+ACTIVÉ =  faux
+finir
+fin )
+
+SOURIS. KeyDown : connecter ( fonction ( KEY )
+KEY = KEY : inférieur () : octet ()
+si CLÉ ==  _G . ESP_BIND  puis
+si ESP_ENABLED ==  faux  alors
+TROUVER ()
+ESP_ENABLED =  vrai
+print ( ' ESP : ON ' )
+elseif ESP_ENABLED ==  vrai  alors
+attends ()
+EFFACER ()
+PISTE =  faux
+ESP_ENABLED =  faux
+print ( ' ESP : OFF ' )
+finir
+finir
+fin )
+
+SOURIS. KeyDown : connecter ( fonction ( KEY )
+si CLÉ ==  _G . CHANGE_AIM  puis
+si  _G . AIM_AT  ==  ' Tête '  alors
+_G . AIM_AT  =  ' HumanoidRootPart '
+GUI_AIM_AT. Text  =  ' AIMING : HumanoidRootPart '  -- fonctionne pour chaque modèle
+elseif  _G . AIM_AT  ==  ' HumanoidRootPart '  alors
+_G . AIM_AT  =  ' Tête '
+GUI_AIM_AT. Texte  =  ' VISÉE : Tête '
+finir
+finir
+fin )
+
+jeu : GetService ( ' RunService ' ). RenderStepped : connect ( fonction ()
+si ACTIVÉ alors
+CIBLE locale =  GetNearestPlayerToMouse ()
+si (TARGET ~=  false ) alors
+AIM local = CIBLE : FindFirstChild ( _G . AIM_AT )
+si AIM alors
+CC. CoordinateFrame  = CFrame. nouveau (CC. CoordinateFrame . p , AIM. CFrame . p )
+finir
+GUI_TARGET. Texte  =  ' AIMBOT : ' .. CIBLE. Nom : sous ( 1 , 5 )
+autre
+GUI_TARGET. Texte  =  ' AIMBOT : OFF '
+finir
+finir
+fin )
+
+répéter
+attends ()
+si ESP_ENABLED ==  vrai  alors
+TROUVER ()
+finir
+jusqu'à ESP_ENABLED ==  faux
+
+
+attends ()
+
+_G . FREE_FOR_ALL  =  vrai
+
+_G . LIER  =  50  -- CTRL GAUCHE
+_G . ESP_BIND  =  52  -- ALT GAUCHE 
